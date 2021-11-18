@@ -16,7 +16,7 @@ const float SEA_SPEED=.1;
 const float SEA_FREQ=.15;
 
 const vec3 SEA_WATER_COLOR=vec3(.3647,.4078,.1804);
-const vec3 SKY_BASE_COLOR=vec3(.2549,.5451,.6196);
+const vec3 SKY_BASE_COLOR=vec3(.3333,.7333,1.);
 
 const float FOG_ATTENUATION_RATE=.99;
 const float FOG_START=0.;
@@ -182,7 +182,7 @@ vec3 sunTexture(vec3 dPos,vec3 sunDir,vec3 sunLightColor){
 vec3 skyTexture(vec3 dPos,vec3 lightColor){
     vec3 normal=normalize(dPos);
     vec3 vertical=vec3(0.,1.,0.);
-    vec3 texture=vec3(mix(lightColor,SKY_BASE_COLOR,dot(normal,vertical)));
+    vec3 texture=vec3(mix(lightColor,SKY_BASE_COLOR*length(lightColor)/sqrt(3.),dot(normal,vertical)));
     return texture;
 }
 
