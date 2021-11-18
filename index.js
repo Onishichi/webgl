@@ -6,6 +6,18 @@ var tempTime = 0.0;
 var fps = 1000 / 30;
 var uniLocation = new Array();
 
+async function read(path) {
+    var response = await fetch(path, { method: "GET" });
+    if (response.ok) { // HTTP ステータスが 200-299 の場合
+        // レスポンスの本文を取得(後述)
+        let text = await response.text();
+        return text;
+    } else {
+        console.error(response);
+        throw `Could not read file ${path}`;
+    }
+}
+
 // レンダリングを行う関数
 function render() {
     // フラグチェック
@@ -66,39 +78,56 @@ window.onload = function () {
     // WebGL コンテキストを取得
     gl = c.getContext('webgl') || c.getContext('experimental-webgl');
 
-    // シェーダ周りの初期化
-    var prg = create_program(create_shader('vertex-shader'), create_shader('fragment-shader'));
-    run = (prg != null); if (!run) { eCheck.checked = false; }
-    uniLocation[0] = gl.getUniformLocation(prg, 'u_time');
-    uniLocation[1] = gl.getUniformLocation(prg, 'u_mouse');
-    uniLocation[2] = gl.getUniformLocation(prg, 'u_resolution');
+    // シェーダーを取得
+    Promise.all([
+        read("./shaders/fragments/kugenuma.frag"),
+        read("./shaders/vertexes/vertex.vert")
+    ])
+        .then(shaders => {
+            // 読み込んだシェーダーの設定
+            var fragmentShader = document.createTextNode(shaders[0]);
+            var vertexShader = document.createTextNode(shaders[1]);
+            document.getElementById("fragment-shader").appendChild(fragmentShader);
+            document.getElementById("vertex-shader").appendChild(vertexShader);
+        })
+        .then(() => {
+            // シェーダ周りの初期化
+            var prg = create_program(create_shader('vertex-shader'), create_shader('fragment-shader'));
+            run = (prg != null); if (!run) { eCheck.checked = false; }
+            uniLocation[0] = gl.getUniformLocation(prg, 'u_time');
+            uniLocation[1] = gl.getUniformLocation(prg, 'u_mouse');
+            uniLocation[2] = gl.getUniformLocation(prg, 'u_resolution');
 
-    // 頂点データ回りの初期化
-    var position = [
-        -1.0, 1.0, 0.0,
-        1.0, 1.0, 0.0,
-        -1.0, -1.0, 0.0,
-        1.0, -1.0, 0.0
-    ];
-    var index = [
-        0, 2, 1,
-        1, 2, 3
-    ];
-    var vPosition = create_vbo(position);
-    var vIndex = create_ibo(index);
-    var vAttLocation = gl.getAttribLocation(prg, 'position');
-    gl.bindBuffer(gl.ARRAY_BUFFER, vPosition);
-    gl.enableVertexAttribArray(vAttLocation);
-    gl.vertexAttribPointer(vAttLocation, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vIndex);
+            // 頂点データ回りの初期化
+            var position = [
+                -1.0, 1.0, 0.0,
+                1.0, 1.0, 0.0,
+                -1.0, -1.0, 0.0,
+                1.0, -1.0, 0.0
+            ];
+            var index = [
+                0, 2, 1,
+                1, 2, 3
+            ];
+            var vPosition = create_vbo(position);
+            var vIndex = create_ibo(index);
+            var vAttLocation = gl.getAttribLocation(prg, 'position');
+            gl.bindBuffer(gl.ARRAY_BUFFER, vPosition);
+            gl.enableVertexAttribArray(vAttLocation);
+            gl.vertexAttribPointer(vAttLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vIndex);
 
-    // その他の初期化
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    mx = 0.5; my = 0.5;
-    startTime = new Date().getTime();
-
-    // レンダリング関数呼出
-    render();
+            // その他の初期化
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            mx = 0.5; my = 0.5;
+            startTime = new Date().getTime();
+        })
+        .then(() => {
+            render();
+        })
+        .catch((error) => {
+            alert(error);
+        });
 };
 
 
