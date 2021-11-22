@@ -70,6 +70,8 @@ window.onload = function () {
 
     // エレメントを取得
     eCheck = document.getElementById('check');
+    // チェックをつける
+    eCheck.checked = true;
 
     // イベントリスナー登録
     c.addEventListener('mousemove', mouseMove, true);
