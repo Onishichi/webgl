@@ -84,7 +84,7 @@ float seaDistFunc(vec3 p){
     const mat2 octave_m=mat2(1.6,1.2,-1.2,1.6);
     
     // ITER_FRAGMENT = 5
-    for(int i=0;i<3;i++)
+    for(int i=0;i<4;i++)
     {
         d=sea_octave((uv+u_time*SEA_SPEED)*freq,choppy);
         d+=sea_octave((uv-u_time*SEA_SPEED)*freq,choppy);
@@ -192,7 +192,7 @@ vec3 seaTextureFunc(vec3 dPos,vec3 cPos,vec3 lightDir,vec3 lightColor){
     float dist=length(dPos-cPos);
     vec3 ray=normalize(dPos-cPos);
     vec3 halfLE=normalize(lightDir-ray);
-    float spec=specular(halfLE,normal,500.);
+    float spec=specular(halfLE,normal,400.);
     
     vec3 ref=reflect(ray,normal);
     vec3 reflected=skyTexture(ref,lightColor);
