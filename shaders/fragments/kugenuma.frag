@@ -12,7 +12,7 @@ const float SKY_HEIGHT=.2;
 
 const float SEA_HEIGHT=.6;
 const float SEA_CHOPPY=4.;
-const float SEA_SPEED=5.;
+const float SEA_SPEED=3.;
 const float SEA_FREQ=.15;
 
 const vec3 SEA_WATER_COLOR=vec3(.3647,.4078,.1804);
